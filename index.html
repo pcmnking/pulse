@@ -562,6 +562,18 @@
     </footer>
 
     <!-- ==================== 互動式教學彈窗 (Modal) ==================== -->
+    <div class="modal-overlay" id="image-preview-modal">
+        <div class="modal-box" style="max-width: 90%; width: auto; padding: 0.75rem; background: var(--bg-card);">
+            <div class="modal-header" style="border: none; padding-bottom: 0.25rem; margin-bottom: 0.5rem;">
+                <h4 id="image-preview-title" style="margin: 0; color: var(--color-primary);">圖片預覽</h4>
+                <button class="modal-close" id="image-preview-close">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 0;">
+                <img id="image-preview-img" src="" alt="圖片預覽" style="max-width: 100%; max-height: 80vh; border-radius: 6px; object-fit: contain; box-shadow: var(--glass-shadow);">
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="acupoint-modal">
         <div class="modal-box">
             <div class="modal-header">

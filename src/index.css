@@ -1214,3 +1214,39 @@ footer {
     color: var(--color-accent);
     border-color: rgba(var(--color-accent-rgb), 0.15);
 }
+
+/* 講義圖片排版與點擊放大效果 */
+.lecture-img-wrapper {
+    margin: 1.5rem 0;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    background-color: var(--bg-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: var(--transition-smooth);
+}
+
+.lecture-img-wrapper:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-primary);
+}
+
+.zoomable-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    cursor: zoom-in;
+    transition: transform 0.2s ease;
+}
+
+.zoomable-img:hover {
+    transform: scale(1.005);
+}
+
+/* 確保預覽大圖能夠良好響應 */
+#image-preview-img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+}

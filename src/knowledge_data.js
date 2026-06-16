@@ -76,6 +76,12 @@ const LECTURE_DATA = [
                 <h5>💡 教學指南：</h5>
                 <p>脈象的深度反映了「病位」在表還是在裡，而力量的大小則反映了「人體正氣」與「外邪」的力量強弱（虛實）。兩者結合，即可快速斷定人體的基本體質與症狀類別。</p>
             </div>
+
+            <h3>3. 獨異脈判定與六部位警訊對照表</h3>
+            <p>以下為臨床上常用的「六部獨異脈、層級與力量對照總表」以及「判讀流程圖」，點擊圖片可放大檢視：</p>
+            <div class="lecture-img-wrapper">
+                <img src="./src/pulse-2.png" alt="六部獨異脈與判讀流程圖" class="zoomable-img">
+            </div>
         `,
         slides: [
             {
@@ -165,6 +171,12 @@ const LECTURE_DATA = [
                 <h5>⚠️ 教學引申（氣血失調）：</h5>
                 <p>左右手脈象不對稱在臨床極為常見。例如左手呈現「深層+無力」（裡血虛/陰虛），右手呈現「淺層+有力」（表實熱），說明患者底子虛寒（陰血透支），表層卻有虛火外炎。若此時盲目使用寒涼藥退熱，會更傷元陰，應採用引火歸元、滋陰降火之法。</p>
             </div>
+
+            <h3>3. 氣血不同層級與力量對應圖表</h3>
+            <p>以下為氣血陰陽在不同脈位層級與力量級數下的辨證對應關係圖表，點擊可放大檢視：</p>
+            <div class="lecture-img-wrapper">
+                <img src="./src/pulse-1.png" alt="左右手脈象深度與力量對應表" class="zoomable-img">
+            </div>
         `,
         slides: [
             {
@@ -222,6 +234,12 @@ const LECTURE_DATA = [
                 <li>若<strong>左手整體脈弱</strong>：多屬血虛、陰不足，如面色萎黃、心悸失眠。</li>
                 <li>若<strong>右手整體脈弱</strong>：多屬氣虛、陽不足，如少氣懶言、手腳冰冷。</li>
             </ul>
+
+            <h3>3. 寸關尺臟腑定位圖表</h3>
+            <p>以下為寸關尺「右氣左血」臟腑定位與常見異常脈象對照表，點擊可放大檢視：</p>
+            <div class="lecture-img-wrapper">
+                <img src="./src/pulse-3.png" alt="中醫寸關尺臟腑定位表" class="zoomable-img">
+            </div>
         `,
         slides: [
             {

@@ -907,6 +907,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
+    // 11.5 講義圖片大圖檢視彈窗控制
+    // ==========================================
+    const imgPreviewModal = document.getElementById("image-preview-modal");
+    const imgPreviewImg = document.getElementById("image-preview-img");
+    const imgPreviewTitle = document.getElementById("image-preview-title");
+    const imgPreviewClose = document.getElementById("image-preview-close");
+
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("zoomable-img")) {
+            if (imgPreviewModal && imgPreviewImg && imgPreviewTitle) {
+                imgPreviewImg.src = e.target.src;
+                imgPreviewTitle.textContent = e.target.alt || "圖片預覽";
+                imgPreviewModal.classList.add("active");
+            }
+        }
+    });
+
+    if (imgPreviewClose && imgPreviewModal) {
+        const closeImgModal = () => {
+            imgPreviewModal.classList.remove("active");
+        };
+        imgPreviewClose.addEventListener("click", closeImgModal);
+        imgPreviewModal.addEventListener("click", (e) => {
+            if (e.target === imgPreviewModal) {
+                closeImgModal();
+            }
+        });
+    }
+
+    // ==========================================
     // 12. 系統初始化
     // ==========================================
     function init() {
