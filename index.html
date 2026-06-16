@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧脈診辨證與中醫脈學教學系統</title>
+    <!-- 引入 FontAwesome 圖標庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./src/index.css">
+</head>
+<body>
+    <!-- 錯誤除錯看板 -->
+    <div id="error-console-debug" style="background: #ef4444; color: white; padding: 15px; font-family: monospace; font-size: 14px; line-height: 1.5; z-index: 999999; position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; display: none; border-bottom: 3px solid #b91c1c; max-height: 200px; overflow-y: auto;">
+        <strong>⚠️ 偵測到 JavaScript 執行錯誤：</strong><br>
+    </div>
+    <script>
+        window.addEventListener('error', function(e) {
+            var el = document.getElementById('error-console-debug');
+            el.style.display = 'block';
+            var div = document.createElement('div');
+            div.textContent = e.message + ' (' + e.filename + ':' + e.lineno + ':' + e.colno + ')';
+            el.appendChild(div);
+        });
+    </script>
+
+    <!-- 動態背景微光 -->
+    <div class="bg-glow"></div>
+
+    <!-- 頂部導覽列 -->
+    <header>
+        <div class="nav-container">
+            <div class="logo-group">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-yin-yang"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>智慧脈診辨證系統</h1>
+                    <p>切脈辨證 • 講義解說 • 教學展示</p>
+                </div>
+            </div>
+
+            <nav>
+                <button class="nav-btn active" data-target="diagnoser">
+                    <i class="fa-solid fa-stethoscope"></i> 脈診分析器
+                </button>
+                <button class="nav-btn" data-target="lectures">
+                    <i class="fa-solid fa-book-open"></i> 中醫脈學講義
+                </button>
+                <button class="nav-btn" data-target="history">
+                    <i class="fa-solid fa-clock-rotate-left"></i> 診斷紀錄
+                </button>
+            </nav>
+
+            <div class="controls-group">
+                <button class="icon-btn" id="theme-toggle" title="切換深/淺色模式">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="icon-btn" id="system-reset" title="重置系統">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main>
+        <!-- ==================== 1. 脈診分析器分頁 ==================== -->
+        <section id="diagnoser" class="page-tab active">
+            <div class="dashboard-grid">
+                <!-- 左欄：參數輸入 -->
+                <div class="input-panel">
+                    <!-- 總脈深度與力量設定 -->
+                    <div class="glass-card primary-edge">
+                        <h3 class="card-title">
+                            <i class="fa-solid fa-arrows-up-down"></i> 1. 整體總脈設定 (快速設定基準)
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                            請先設定患者左右手的整體總脈參數，這會自動套用到該手的寸關尺部位：
+                        </p>
+                        
+                        <div class="pulse-range-group" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <!-- 左手 -->
+                            <div class="range-item" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div>
+                                    <div class="range-header">
+                                        <span class="range-label">左手總脈深度 (血/陰)</span>
+                                        <span class="range-val-text" id="left-depth-val">C層 (中)</span>
+                                    </div>
+                                    <input type="range" min="1" max="5" value="3" class="custom-range" id="left-depth-range">
+                                    <div class="range-ticks">
+                                        <span>A(淺)</span>
+                                        <span>B</span>
+                                        <span>C(中)</span>
+                                        <span>D</span>
+                                        <span>E(深)</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="range-header">
+                                        <span class="range-label">左手總脈力量 (虛/實)</span>
+                                        <span class="range-val-text" id="left-force-val">3級 (中)</span>
+                                    </div>
+                                    <input type="range" min="1" max="5" value="3" class="custom-range" id="left-force-range">
+                                    <div class="range-ticks">
+                                        <span>1(弱)</span>
+                                        <span>2</span>
+                                        <span>3(中)</span>
+                                        <span>4</span>
+                                        <span>5(實)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 右手 -->
+                            <div class="range-item" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div>
+                                    <div class="range-header">
+                                        <span class="range-label">右手總脈深度 (氣/陽)</span>
+                                        <span class="range-val-text" id="right-depth-val">C層 (中)</span>
+                                    </div>
+                                    <input type="range" min="1" max="5" value="3" class="custom-range" id="right-depth-range">
+                                    <div class="range-ticks">
+                                        <span>A(淺)</span>
+                                        <span>B</span>
+                                        <span>C(中)</span>
+                                        <span>D</span>
+                                        <span>E(深)</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="range-header">
+                                        <span class="range-label">右手總脈力量 (虛/實)</span>
+                                        <span class="range-val-text" id="right-force-val">3級 (中)</span>
+                                    </div>
+                                    <input type="range" min="1" max="5" value="3" class="custom-range" id="right-force-range">
+                                    <div class="range-ticks">
+                                        <span>1(弱)</span>
+                                        <span>2</span>
+                                        <span>3(中)</span>
+                                        <span>4</span>
+                                        <span>5(實)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 互動式寸關尺與獨異脈 -->
+                    <div class="glass-card primary-edge">
+                        <h3 class="card-title">
+                            <i class="fa-solid fa-hand-pointer"></i> 2. 寸關尺與獨異脈設定
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                            請<strong>點擊手腕圖上的部位</strong>（如左寸、右關），即可在下方專屬面板中設定其精細的深度與力量（如 B2）
+                        </p>
+
+                        <!-- SVG 手腕繪圖 -->
+                        <div class="wrist-visualizer-container">
+                            <!-- 左手腕 -->
+                            <div class="wrist-card" id="card-left-wrist">
+                                <h4>左手 (主血、心肝腎)</h4>
+                                <svg class="wrist-svg" viewBox="0 0 160 220">
+                                    <!-- 手腕輪廓 -->
+                                    <path class="svg-hand-outline" d="M30,220 C30,170 20,130 20,80 C20,50 30,30 50,20 C70,10 90,10 110,20 C130,30 140,50 140,80 C140,130 130,170 130,220" />
+                                    <!-- 橈動脈線 -->
+                                    <path class="svg-artery" d="M120,220 L120,120 C120,90 110,70 100,50" />
+                                    
+                                    <!-- 左寸 (心) -->
+                                    <g class="pulse-point" id="point-left-cun" data-pos="leftCun">
+                                        <circle class="outer" cx="120" cy="90" r="12" />
+                                        <circle class="inner" cx="120" cy="90" r="3" />
+                                        <text class="point-text" x="72" y="90">寸 (心)</text>
+                                        <text class="point-param-badge" id="badge-left-cun" x="120" y="90">C3</text>
+                                    </g>
+                                    <!-- 左關 (肝) -->
+                                    <g class="pulse-point" id="point-left-guan" data-pos="leftGuan">
+                                        <circle class="outer" cx="120" cy="130" r="12" />
+                                        <circle class="inner" cx="120" cy="130" r="3" />
+                                        <text class="point-text" x="72" y="130">關 (肝膽)</text>
+                                        <text class="point-param-badge" id="badge-left-guan" x="120" y="130">C3</text>
+                                    </g>
+                                    <!-- 左尺 (腎陰) -->
+                                    <g class="pulse-point" id="point-left-chi" data-pos="leftChi">
+                                        <circle class="outer" cx="120" cy="170" r="12" />
+                                        <circle class="inner" cx="120" cy="170" r="3" />
+                                        <text class="point-text" x="72" y="170">尺 (腎陰)</text>
+                                        <text class="point-param-badge" id="badge-left-chi" x="120" y="170">C3</text>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- 右手腕 -->
+                            <div class="wrist-card" id="card-right-wrist">
+                                <h4>右手 (主氣、肺脾腎)</h4>
+                                <svg class="wrist-svg" viewBox="0 0 160 220">
+                                    <!-- 手腕輪廓 (鏡像) -->
+                                    <path class="svg-hand-outline" d="M130,220 C130,170 140,130 140,80 C140,50 130,30 110,20 C90,10 70,10 50,20 C30,30 20,50 20,80 C20,130 30,170 30,220" />
+                                    <!-- 橈動脈線 (鏡像) -->
+                                    <path class="svg-artery" d="M40,220 L40,120 C40,90 50,70 60,50" />
+                                    
+                                    <!-- 右寸 (肺) -->
+                                    <g class="pulse-point" id="point-right-cun" data-pos="rightCun">
+                                        <circle class="outer" cx="40" cy="90" r="12" />
+                                        <circle class="inner" cx="40" cy="90" r="3" />
+                                        <text class="point-text" x="88" y="90">寸 (肺)</text>
+                                        <text class="point-param-badge" id="badge-right-cun" x="40" y="90">C3</text>
+                                    </g>
+                                    <!-- 右關 (脾) -->
+                                    <g class="pulse-point" id="point-right-guan" data-pos="rightGuan">
+                                        <circle class="outer" cx="40" cy="130" r="12" />
+                                        <circle class="inner" cx="40" cy="130" r="3" />
+                                        <text class="point-text" x="88" y="130">關 (脾胃)</text>
+                                        <text class="point-param-badge" id="badge-right-guan" x="40" y="130">C3</text>
+                                    </g>
+                                    <!-- 右尺 (腎陽) -->
+                                    <g class="pulse-point" id="point-right-chi" data-pos="rightChi">
+                                        <circle class="outer" cx="40" cy="170" r="12" />
+                                        <circle class="inner" cx="40" cy="170" r="3" />
+                                        <text class="point-text" x="88" y="170">尺 (腎陽)</text>
+                                        <text class="point-param-badge" id="badge-right-chi" x="40" y="170">C3</text>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- 📋 當前寸關尺設定摘要 -->
+                            <div class="wrist-card" id="card-summary-board" style="max-width: 240px; display: flex; flex-direction: column;">
+                                <h4>📋 當前設定參數</h4>
+                                <div class="summary-board-list" style="width: 100%; display: flex; flex-direction: column; gap: 0.65rem; padding: 0.5rem 0; flex: 1; justify-content: center;">
+                                    <div style="border-bottom: 1px dashed var(--border-color); padding-bottom: 0.35rem; font-weight: 600; font-size: 0.8rem; color: var(--color-info);">左手 - 主血</div>
+                                    <div class="summary-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                                        <span>左寸 (心/腦)</span>
+                                        <span id="summary-left-cun" class="summary-badge-val normal">C3</span>
+                                    </div>
+                                    <div class="summary-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                                        <span>左關 (肝膽)</span>
+                                        <span id="summary-left-guan" class="summary-badge-val normal">C3</span>
+                                    </div>
+                                    <div class="summary-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                                        <span>左尺 (腎陰)</span>
+                                        <span id="summary-left-chi" class="summary-badge-val normal">C3</span>
+                                    </div>
+                                    
+                                    <div style="border-bottom: 1px dashed var(--border-color); padding-top: 0.4rem; padding-bottom: 0.35rem; font-weight: 600; font-size: 0.8rem; color: var(--color-primary);">右手 - 主氣</div>
+                                    <div class="summary-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                                        <span>右寸 (肺)</span>
+                                        <span id="summary-right-cun" class="summary-badge-val normal">C3</span>
+                                    </div>
+                                    <div class="summary-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                                        <span>右關 (脾胃)</span>
+                                        <span id="summary-right-guan" class="summary-badge-val normal">C3</span>
+                                    </div>
+                                    <div class="summary-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                                        <span>右尺 (腎陽)</span>
+                                        <span id="summary-right-chi" class="summary-badge-val normal">C3</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 🎯 部位設定微調面板 (動態浮出) -->
+                        <div class="focus-config-box" id="focus-config-panel">
+                            <div class="focus-config-title">
+                                <span>🎯 調整部位設定</span>
+                                <button type="button" class="modal-close" style="font-size:1.1rem; line-height:1;" id="close-focus-panel">&times;</button>
+                            </div>
+                            <div class="focus-config-body">
+                                <div class="focus-config-inputs">
+                                    <h4 style="font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--text-secondary);">
+                                        選取部位：<strong id="focus-part-name" style="color: var(--color-primary); font-size: 0.95rem;">未選取</strong>
+                                    </h4>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                        <div>
+                                            <div class="range-header">
+                                                <span class="range-label">部位脈層深度</span>
+                                                <span class="range-val-text" id="focus-depth-val">C層 (中)</span>
+                                            </div>
+                                            <input type="range" min="1" max="5" value="3" class="custom-range" id="focus-depth-range">
+                                            <div class="range-ticks">
+                                                <span>A(淺)</span>
+                                                <span>B</span>
+                                                <span>C</span>
+                                                <span>D</span>
+                                                <span>E(深)</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="range-header">
+                                                <span class="range-label">部位按壓力量</span>
+                                                <span class="range-val-text" id="focus-force-val">3級 (中)</span>
+                                            </div>
+                                            <input type="range" min="1" max="5" value="3" class="custom-range" id="focus-force-range">
+                                            <div class="range-ticks">
+                                                <span>1(弱)</span>
+                                                <span>2</span>
+                                                <span>3</span>
+                                                <span>4</span>
+                                                <span>5(實)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 預設快捷按鈕 -->
+                                    <div class="presets-flex">
+                                        <span style="font-size: 0.75rem; color: var(--text-muted); align-self: center; margin-right: 0.25rem;">常用脈象快捷：</span>
+                                        <button type="button" class="preset-btn" data-depth="3" data-force="3">平脈 (C3)</button>
+                                        <button type="button" class="preset-btn" data-depth="3" data-force="4">弦脈 (C4)</button>
+                                        <button type="button" class="preset-btn" data-depth="4" data-force="2">細脈 (D2)</button>
+                                        <button type="button" class="preset-btn" data-depth="2" data-force="2">弱脈 (B2)</button>
+                                        <button type="button" class="preset-btn" data-depth="2" data-force="4">滑脈 (B4)</button>
+                                    </div>
+                                </div>
+                                <!-- 🎯 右側：當前部位脈象結果與參數顯示 -->
+                                <div class="focus-config-result">
+                                    <h5 style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;"><i class="fa-solid fa-square-poll-vertical" style="color: var(--color-primary); margin-right: 0.25rem;"></i>當前部位脈象結果：</h5>
+                                    <div class="focus-result-badge-row" style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
+                                        <span id="focus-result-badge" class="result-param-code">C3</span>
+                                        <span id="focus-result-state" class="organ-status-tag normal">正常</span>
+                                    </div>
+                                    <p id="focus-result-desc" style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin: 0; background: var(--bg-primary); padding: 0.5rem; border-radius: 4px; border-left: 2px solid var(--color-primary);">心經脈氣平順從容。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 生活感受問診 -->
+                    <div class="glass-card primary-edge">
+                        <h3 class="card-title">
+                            <i class="fa-solid fa-circle-question"></i> 3. 最近的生活感受問診
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                            請勾選您最近一週常有或較突出的身體主觀感受（多選）
+                        </p>
+                        
+                        <div class="questionnaire-group">
+                            <div class="question-block" style="background:transparent; border:none; padding:0;">
+                                <div class="options-flex">
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="stress">
+                                        <span class="chip-label">工作壓力大</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="irritability">
+                                        <span class="chip-label">焦慮易怒 / 容易生氣</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="insomnia">
+                                        <span class="chip-label">入睡困難 / 多夢易醒</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="fatigue">
+                                        <span class="chip-label">神疲乏力 / 精神差</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="cold_limbs">
+                                        <span class="chip-label">手腳冰冷 / 畏寒怕冷</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="bloating">
+                                        <span class="chip-label">飯後容易胃脹 / 便溏</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="cough">
+                                        <span class="chip-label">喉嚨敏咳 / 氣喘</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="hot_flashes">
+                                        <span class="chip-label">手心發熱 / 潮熱盜汗</span>
+                                    </label>
+                                    <label class="chip-option">
+                                        <input type="checkbox" name="lifestyle" value="backache">
+                                        <span class="chip-label">腰部酸軟 / 膝蓋冷痛</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 按鈕組 -->
+                        <div class="action-row">
+                            <button class="btn btn-secondary" id="reset-inputs-btn">
+                                <i class="fa-solid fa-trash-can"></i> 清空重置
+                            </button>
+                            <button class="btn btn-primary" id="submit-diagnose-btn">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> 開始辨證診斷
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右欄：診斷報告輸出 -->
+                <div class="output-panel">
+                    <div class="glass-card accent-edge" style="position: sticky; top: 90px;">
+                        <h3 class="card-title" style="color: var(--color-primary); border-color: var(--color-primary);">
+                            <i class="fa-solid fa-square-poll-horizontal"></i> 4. 自動辨證與健康指引
+                        </h3>
+                        
+                        <!-- 預設占位符 -->
+                        <div id="result-placeholder" style="text-align: center; padding: 4rem 0; color: var(--text-muted);">
+                            <i class="fa-solid fa-clipboard-user" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; color: var(--color-primary);"></i>
+                            <p>請於左側設定脈象參數與生活感受，點擊「**開始辨證診斷**」按鈕查看結果報告。</p>
+                        </div>
+
+                        <!-- 診斷結果主區 (預設隱藏) -->
+                        <div id="result-container" style="display: none;">
+                            <div class="result-header">
+                                <div class="syndrome-badge abnormal" id="result-syndrome">平脈氣血和調</div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);" id="result-time">診斷時間: 2026-06-17 00:00</p>
+                            </div>
+
+                            <!-- 五臟氣血指標 -->
+                            <div class="result-section">
+                                <h5><i class="fa-solid fa-chart-simple"></i> 五臟六腑氣血狀態</h5>
+                                <div class="result-organ-grid">
+                                    <div class="organ-bar-box">
+                                        <span class="organ-name-lbl">心經氣血 (左寸)</span>
+                                        <span class="organ-status-tag normal" id="status-heart">正常</span>
+                                    </div>
+                                    <div class="organ-bar-box">
+                                        <span class="organ-name-lbl">肝膽疏泄 (左關)</span>
+                                        <span class="organ-status-tag normal" id="status-liver">正常</span>
+                                    </div>
+                                    <div class="organ-bar-box">
+                                        <span class="organ-name-lbl">下焦腎陰 (左尺)</span>
+                                        <span class="organ-status-tag normal" id="status-kidneyYin">正常</span>
+                                    </div>
+                                    <div class="organ-bar-box">
+                                        <span class="organ-name-lbl">肺司呼吸 (右寸)</span>
+                                        <span class="organ-status-tag normal" id="status-lung">正常</span>
+                                    </div>
+                                    <div class="organ-bar-box">
+                                        <span class="organ-name-lbl">脾胃運化 (右關)</span>
+                                        <span class="organ-status-tag normal" id="status-spleen">正常</span>
+                                    </div>
+                                    <div class="organ-bar-box">
+                                        <span class="organ-name-lbl">命門元陽 (右尺)</span>
+                                        <span class="organ-status-tag normal" id="status-kidneyYang">正常</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 病機解讀 -->
+                            <div class="result-section">
+                                <h5><i class="fa-solid fa-heart-pulse"></i> 脈証深度病機解讀</h5>
+                                <div class="result-text warning-border" id="result-pathology">
+                                    肝主疏泄，主情緒調節。左關獨異脈為弦，代表肝鬱氣滯...
+                                </div>
+                            </div>
+
+                            <!-- 調理指引 -->
+                            <div class="result-section">
+                                <h5><i class="fa-solid fa-leaf"></i> 系統調理建議與中醫良方</h5>
+                                <div class="suggestion-list">
+                                    <!-- 食療建議 -->
+                                    <div class="suggestion-card">
+                                        <div class="sugg-icon">🍵</div>
+                                        <div class="sugg-body">
+                                            <h6>膳食與茶飲調理</h6>
+                                            <p id="result-diet">建議常飲用玫瑰薄荷茶、佛手柑茶。</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 穴位指引 -->
+                                    <div class="suggestion-card">
+                                        <div class="sugg-icon">📌</div>
+                                        <div class="sugg-body" style="width: 100%;">
+                                            <h6>保健穴位按摩 (點擊查看定位解說)</h6>
+                                            <div class="acupoint-badge-grid" id="result-acupoints">
+                                                <!-- badges populated by js -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 作息調理 -->
+                                    <div class="suggestion-card">
+                                        <div class="sugg-icon">🧘</div>
+                                        <div class="sugg-body">
+                                            <h6>生活作息與情緒管理</h6>
+                                            <p id="result-lifestyle">建議晚上11點前入睡，避免熬夜過勞。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-secondary" style="margin-top: 1rem; width: 100%;" id="save-report-btn">
+                                <i class="fa-solid fa-bookmark"></i> 保存本次診斷至歷史紀錄
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 2. 專業脈學講義分頁 ==================== -->
+        <section id="lectures" class="page-tab">
+            <div class="lecture-layout">
+                <!-- 左側：講義目錄 -->
+                <div class="lecture-sidebar">
+                    <h3 class="sidebar-title"><i class="fa-solid fa-folder-open"></i> 講義大綱</h3>
+                    <ul class="lecture-menu-list" id="lecture-menu">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- 右側：講義閱讀器 -->
+                <div class="lecture-reader">
+                    <div class="reading-progress-bar" id="read-progress"></div>
+                    
+                    <!-- 閱讀器工具列 -->
+                    <div class="reader-toolbar">
+                        <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" id="enter-ppt-btn">
+                            <i class="fa-solid fa-desktop"></i> 進入投影簡報模式
+                        </button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="icon-btn" id="prev-chap-btn" title="上一章"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="icon-btn" id="next-chap-btn" title="下一章"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- 講義本文 -->
+                    <div class="lecture-content" id="reader-content">
+                        <!-- Content rendered here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. 診斷歷史紀錄分頁 ==================== -->
+        <section id="history" class="page-tab">
+            <div class="glass-card primary-edge">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.75rem;">
+                    <h3 class="card-title" style="border: none; margin: 0; padding: 0;">
+                        <i class="fa-solid fa-clock-history"></i> 脈診辨證歷史存檔
+                    </h3>
+                    <button class="btn btn-secondary" style="flex: none; padding: 0.5rem 1rem; font-size: 0.85rem;" id="clear-all-history-btn">
+                        <i class="fa-solid fa-trash-can"></i> 清空所有歷史紀錄
+                    </button>
+                </div>
+
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>診斷時間</th>
+                                <th>脈象參數 (左/右)</th>
+                                <th>獨異脈狀態</th>
+                                <th>辨證結論</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-list-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                    <div class="empty-history-tip" id="empty-history-tip">
+                        目前尚無診斷紀錄。請至「脈診分析器」進行診斷並保存。
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 頁尾聲明 -->
+    <footer>
+        <p>© 2026 智慧中醫脈學辨證與教學系統 | Designed with <i class="fa-solid fa-heart" style="color: var(--color-primary);"></i> for Teaching & Practice</p>
+    </footer>
+
+    <!-- ==================== 互動式教學彈窗 (Modal) ==================== -->
+    <div class="modal-overlay" id="acupoint-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h4 id="modal-point-name">太衝穴</h4>
+                <button class="modal-close" id="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-point-body">
+                <!-- content populated by js -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" style="flex: none; padding: 0.5rem 1.2rem;" id="modal-confirm-btn">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PPT 教學投影全螢幕容器 ==================== -->
+    <div class="presentation-mode" id="ppt-container" style="display: none;">
+        <button class="ppt-close-btn" id="exit-ppt-btn">
+            <i class="fa-solid fa-xmark"></i> 退出投影片 (Esc)
+        </button>
+        <div class="lecture-reader">
+            <div class="lecture-content" id="ppt-content-area" style="text-align: left;">
+                <!-- Slides items rendered here dynamically -->
+            </div>
+        </div>
+        
+        <!-- PPT 下方控制導覽 -->
+        <div class="ppt-nav">
+            <button class="ppt-btn" id="ppt-prev-btn"><i class="fa-solid fa-arrow-left"></i></button>
+            <span style="font-size: 1.1rem; font-weight: 600;" id="ppt-page-indicator">第 1 / 10 頁</span>
+            <button class="ppt-btn" id="ppt-next-btn"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- 引入數據與邏輯檔案 -->
+    <script src="./src/knowledge_data.js"></script>
+    <script src="./src/pulse_engine.js"></script>
+    <script src="./src/app.js"></script>
+</body>
+</html>

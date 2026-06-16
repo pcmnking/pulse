@@ -1,0 +1,14 @@
+{
+  "name": "pulse-diagnosis-system",
+  "version": "1.0.0",
+  "description": "智慧脈診辨證與中醫脈學教學系統",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^4.5.0"
+  }
+}
