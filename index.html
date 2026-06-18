@@ -481,6 +481,27 @@
                             <button class="btn btn-secondary" style="margin-top: 1rem; width: 100%;" id="save-report-btn">
                                 <i class="fa-solid fa-bookmark"></i> 保存本次診斷至歷史紀錄
                             </button>
+
+                            <!-- 《瀕湖脈學》對照區塊 -->
+                            <div id="binhu-section" style="margin-top: 1.5rem; border-top: 2px dashed var(--border-color); padding-top: 1.25rem;">
+                                <h5 style="display:flex; align-items:center; gap:0.5rem; color: var(--color-primary); margin-bottom: 0.75rem;">
+                                    <i class="fa-solid fa-scroll"></i> 《瀕湖脈學》李時珍脈象對照
+                                </h5>
+                                <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.85rem;">
+                                    依據李時珍《瀕湖脈學》，將本次把脈編碼轉換為傳統27脈脈象，以利進一步查閱古典文獻。
+                                </p>
+                                <div id="binhu-table-container" style="overflow-x:auto;">
+                                    <!-- Populated by JS -->
+                                </div>
+                                <!-- 複製到 Gemini 按鈕 -->
+                                <button class="btn btn-primary" id="copy-to-gemini-btn" style="margin-top: 1rem; width: 100%; gap: 0.5rem; font-size: 0.95rem; padding: 0.8rem 1rem; position:relative;">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    複製完整《瀕湖脈學》提示詞到 Gemini
+                                </button>
+                                <p style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:0.4rem;">
+                                    點擊後文字已複製至剪貼簿，請直接貼到 <strong>Gemini</strong> 或 <strong>ChatGPT</strong> 進行深度解讀 📋
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

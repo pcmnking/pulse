@@ -1250,3 +1250,103 @@ footer {
     max-height: 80vh;
     object-fit: contain;
 }
+
+/* ==========================================================================
+   《瀕湖脈學》脈象對照表格樣式
+   ========================================================================== */
+.binhu-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.binhu-table thead tr {
+    background: linear-gradient(135deg, var(--color-primary), #047857);
+    color: white;
+}
+
+.binhu-table th {
+    padding: 0.55rem 0.65rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.binhu-table td {
+    padding: 0.5rem 0.65rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.binhu-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.binhu-table tbody tr:hover {
+    background: var(--bg-secondary);
+    transition: background 0.2s ease;
+}
+
+.binhu-table tbody tr:nth-child(odd) {
+    background: var(--bg-primary);
+}
+
+.binhu-table tbody tr:nth-child(odd):hover {
+    background: var(--bg-secondary);
+}
+
+/* 脈象編碼徽章 */
+.binhu-code {
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+    padding: 0.2rem 0.4rem;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+}
+
+.binhu-code.normal {
+    background: var(--bg-secondary);
+    color: var(--color-primary);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+}
+
+.binhu-code.abnormal {
+    background: #ffe4e6;
+    color: var(--color-accent);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.3);
+}
+
+[data-theme="dark"] .binhu-code.abnormal {
+    background: rgba(var(--color-accent-rgb), 0.15);
+}
+
+/* 脈象名稱 */
+.binhu-pulse-name {
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--color-accent);
+    display: inline-block;
+}
+
+.binhu-pulse-name.normal {
+    color: var(--color-primary);
+}
+
+/* 深色模式下對照表微調 */
+[data-theme="dark"] .binhu-table tbody tr:nth-child(odd) {
+    background: rgba(255,255,255,0.02);
+}
+
+[data-theme="dark"] .binhu-code.normal {
+    background: rgba(var(--color-primary-rgb), 0.15);
+}
+

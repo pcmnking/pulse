@@ -540,8 +540,135 @@ document.addEventListener("DOMContentLoaded", () => {
             resultAcupoints.appendChild(badge);
         });
 
+        // 渲染《瀕湖脈學》對照表格
+        renderBinhuTable(state.points);
+
         // 滾動至報告
         resultContainer.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // ==========================================
+    // 7.5 《瀕湖脈學》對照表格渲染
+    // ==========================================
+    function renderBinhuTable(points) {
+        const container = document.getElementById("binhu-table-container");
+        if (!container) return;
+
+        const DEPTH_LETTERS = ["A", "B", "C", "D", "E"];
+        const posInfos = [
+            { key: "leftCun",   label: "左寸", organ: "心/腦" },
+            { key: "leftGuan",  label: "左關", organ: "肝膽" },
+            { key: "leftChi",   label: "左尺", organ: "腎陰" },
+            { key: "rightCun",  label: "右寸", organ: "肺" },
+            { key: "rightGuan", label: "右關", organ: "脾胃" },
+            { key: "rightChi",  label: "右尺", organ: "腎陽" }
+        ];
+
+        let rows = posInfos.map(info => {
+            const p = points[info.key];
+            const d = parseInt(p.depth);
+            const f = parseInt(p.force);
+            const depthLetter = DEPTH_LETTERS[d - 1];
+            const binhuName = PulseEngine.getBinhuPulseName(d, f);
+            const binhuDesc = PulseEngine.getBinhuPulseDesc(d, f);
+            const isNormal = (d === 3 && f === 3);
+
+            const codeClass = isNormal ? "binhu-code normal" : "binhu-code abnormal";
+            const pulseClass = isNormal ? "binhu-pulse-name normal" : "binhu-pulse-name";
+
+            return `
+                <tr>
+                    <td style="white-space:nowrap; font-weight:600; font-size:0.8rem;">${info.label}<br><span style="font-weight:400; font-size:0.72rem; color:var(--text-muted);">(${info.organ})</span></td>
+                    <td><span class="${codeClass}">${depthLetter}${f}</span></td>
+                    <td><span class="${pulseClass}">${binhuName}</span><br><span style="font-size:0.68rem; color:var(--text-muted);">${binhuDesc.category} · ${binhuDesc.nature}</span></td>
+                    <td style="font-size:0.7rem; color:var(--text-secondary); line-height:1.4;">${binhuDesc.zangfu}</td>
+                </tr>
+            `;
+        }).join("");
+
+        container.innerHTML = `
+            <table class="binhu-table">
+                <thead>
+                    <tr>
+                        <th>部位</th>
+                        <th>編碼</th>
+                        <th>《瀕湖脈學》脈象</th>
+                        <th>主臟腑</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        `;
+    }
+
+    // 複製到 Gemini 按鈕
+    const copyToGeminiBtn = document.getElementById("copy-to-gemini-btn");
+    if (copyToGeminiBtn) {
+        copyToGeminiBtn.addEventListener("click", () => {
+            if (!state.currentReport) {
+                alert("請先點擊「開始辨證診斷」產生診斷報告！");
+                return;
+            }
+            const promptText = PulseEngine.generateGeminiPrompt(
+                state.points,
+                state.lifestyle,
+                state.currentReport
+            );
+            // 複製到剪貼簿
+            navigator.clipboard.writeText(promptText).then(() => {
+                showToast("✅ 《瀕湖脈學》提示詞已複製！請貼到 Gemini 進行深度解讀。", "success");
+            }).catch(() => {
+                // fallback for older browsers
+                const ta = document.createElement("textarea");
+                ta.value = promptText;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+                showToast("✅ 《瀕湖脈學》提示詞已複製！請貼到 Gemini 進行深度解讀。", "success");
+            });
+        });
+    }
+
+    // 吐司通知函數
+    function showToast(message, type = "success") {
+        const existing = document.getElementById("toast-notification");
+        if (existing) existing.remove();
+
+        const toast = document.createElement("div");
+        toast.id = "toast-notification";
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: ${type === "success" ? "linear-gradient(135deg, #059669, #10b981)" : "linear-gradient(135deg, #dc2626, #ef4444)"};
+            color: white;
+            padding: 1rem 1.75rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 99999;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            white-space: nowrap;
+            max-width: 90vw;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                toast.style.transform = "translateX(-50%) translateY(0)";
+            });
+        });
+
+        setTimeout(() => {
+            toast.style.transform = "translateX(-50%) translateY(100px)";
+            setTimeout(() => toast.remove(), 400);
+        }, 3500);
     }
 
     // ==========================================
