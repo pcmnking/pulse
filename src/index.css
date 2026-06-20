@@ -1146,10 +1146,12 @@ main {
     -webkit-backdrop-filter: blur(3px);
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none; /* ✅ 非啟動狀態不攔截點擊 */
 }
 
 .mobile-sheet-overlay.active {
     opacity: 1;
+    pointer-events: auto; /* ✅ 啟動後才攔截（關閉點遮罩） */
 }
 
 /* 底部抽屜容器 */
