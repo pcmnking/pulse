@@ -293,6 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     pulsePoints.forEach(point => {
         point.addEventListener("click", () => {
+            // 手機版由底部抽屜接管，此 handler 只處理桌面版
+            if (window.innerWidth <= 768) return;
+
             // 1. 清除所有選中高亮
             pulsePoints.forEach(p => p.classList.remove("selected"));
             
@@ -1076,5 +1079,281 @@ document.addEventListener("DOMContentLoaded", () => {
         resetAllInputs();
     }
 
+    // ==========================================
+    // 13. 📱 手機底部抽屜 (Mobile Bottom Sheet)
+    // ==========================================
+    const mobileSheetOverlay = document.getElementById("mobile-sheet-overlay");
+    const mobileBottomSheet = document.getElementById("mobile-bottom-sheet");
+    const sheetCloseBtn = document.getElementById("sheet-close-btn");
+    const sheetDepthRange = document.getElementById("sheet-depth-range");
+    const sheetForceRange = document.getElementById("sheet-force-range");
+    const sheetDepthVal = document.getElementById("sheet-depth-val");
+    const sheetForceVal = document.getElementById("sheet-force-val");
+    const sheetPartName = document.getElementById("sheet-part-name");
+    const sheetResultCode = document.getElementById("sheet-result-code");
+    const sheetResultState = document.getElementById("sheet-result-state");
+    const sheetResultDesc = document.getElementById("sheet-result-desc");
+    const sheetPartBtns = document.querySelectorAll(".sheet-part-btn");
+    const sheetPresetBtns = document.querySelectorAll(".sheet-preset-btn");
+
+    // 偵測是否為手機版
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+
+    // 開啟底部抽屜
+    function openMobileSheet(pos) {
+        if (!mobileBottomSheet || !mobileSheetOverlay) return;
+        state.selectedPoint = pos;
+
+        // 更新抽屜內容
+        updateSheetForPos(pos);
+
+        // 動畫顯示
+        mobileSheetOverlay.classList.add("active");
+        mobileBottomSheet.classList.add("active");
+
+        // 防止背景滾動
+        document.body.style.overflow = "hidden";
+    }
+
+    // 關閉底部抽屜
+    function closeMobileSheet() {
+        if (!mobileBottomSheet || !mobileSheetOverlay) return;
+        mobileSheetOverlay.classList.remove("active");
+        mobileBottomSheet.classList.remove("active");
+        document.body.style.overflow = "";
+
+        // 清除選中高亮
+        pulsePoints.forEach(p => p.classList.remove("selected"));
+        state.selectedPoint = null;
+    }
+
+    // 更新抽屜內所有 UI（當切換部位或調整滑動條時）
+    function updateSheetForPos(pos) {
+        if (!pos) return;
+        const pData = state.points[pos];
+        if (!pData) return;
+
+        // 標題
+        if (sheetPartName) sheetPartName.textContent = PART_NAMES[pos] || pos;
+
+        // 滑動條
+        if (sheetDepthRange) sheetDepthRange.value = pData.depth;
+        if (sheetForceRange) sheetForceRange.value = pData.force;
+        if (sheetDepthVal) sheetDepthVal.textContent = DEPTH_DESCS[pData.depth - 1];
+        if (sheetForceVal) sheetForceVal.textContent = FORCE_DESCS[pData.force - 1];
+
+        // 更新部位按鈕高亮
+        sheetPartBtns.forEach(btn => {
+            const bPos = btn.getAttribute("data-pos");
+            btn.classList.remove("active");
+            if (bPos === pos) btn.classList.add("active");
+        });
+
+        // 更新結果預覽
+        updateSheetResult(pos);
+    }
+
+    // 更新抽屜結果區
+    function updateSheetResult(pos) {
+        if (!pos) return;
+        const pData = state.points[pos];
+        if (!pData) return;
+
+        const depthChar = DEPTH_LETTERS[pData.depth - 1];
+        const forceNum = pData.force;
+        const isAbnormal = (pData.depth !== 3 || pData.force !== 3);
+
+        if (sheetResultCode) {
+            sheetResultCode.textContent = `${depthChar}${forceNum}`;
+            sheetResultCode.style.color = isAbnormal ? "var(--color-accent)" : "var(--color-primary)";
+        }
+
+        try {
+            const status = PulseEngine.getPointStatus(pos, pData.depth, pData.force);
+            if (sheetResultState) {
+                sheetResultState.textContent = status.state || "正常";
+                sheetResultState.className = `state-tag organ-status-tag ${status.type || "normal"}`;
+            }
+            if (sheetResultDesc) {
+                sheetResultDesc.textContent = status.desc || "脈象平穩。";
+            }
+        } catch(e) {
+            if (sheetResultState) sheetResultState.textContent = "正常";
+            if (sheetResultDesc) sheetResultDesc.textContent = "脈象平穩。";
+        }
+    }
+
+    // 更新所有部位選擇格的徽章數值與顏色
+    function updateAllSheetBadges() {
+        for (const pos in state.points) {
+            const pData = state.points[pos];
+            const depthChar = DEPTH_LETTERS[pData.depth - 1];
+            const badgeEl = document.getElementById(`sheet-badge-${pos}`);
+            if (badgeEl) {
+                badgeEl.textContent = `${depthChar}${pData.force}`;
+                const isAbnormal = (pData.depth !== 3 || pData.force !== 3);
+                badgeEl.style.color = isAbnormal ? "var(--color-accent)" : "var(--color-primary)";
+
+                // 更新按鈕的異常樣式
+                const btn = document.querySelector(`.sheet-part-btn[data-pos="${pos}"]`);
+                if (btn) {
+                    if (isAbnormal) {
+                        btn.classList.add("abnormal");
+                    } else {
+                        btn.classList.remove("abnormal");
+                    }
+                }
+            }
+        }
+    }
+
+    // 監聽 SVG 脈點點擊 - 手機版開啟抽屜
+    // (覆寫之前的 click handler，讓手機版改開抽屜)
+    pulsePoints.forEach(point => {
+        // 移除舊 listener（無法直接移除，改用不同的事件處理架構）
+        // 原來的 click 已在上方 section 6 中綁定，這裡我們改用 capture phase 攔截
+        point.addEventListener("click", () => {
+            if (isMobile()) {
+                const pos = point.getAttribute("data-pos");
+                // 高亮 SVG 點
+                pulsePoints.forEach(p => p.classList.remove("selected"));
+                point.classList.add("selected");
+                openMobileSheet(pos);
+            }
+        }, true); // capture: true 讓此 handler 先執行
+    });
+
+    // 抽屜部位選擇按鈕（直接在抽屜內切換部位）
+    sheetPartBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const pos = btn.getAttribute("data-pos");
+            if (!pos) return;
+            state.selectedPoint = pos;
+
+            // 高亮 SVG 上對應點
+            const hyphenatedPos = pos.replace(/([A-Z])/g, "-$1").toLowerCase();
+            pulsePoints.forEach(p => p.classList.remove("selected"));
+            const svgPoint = document.getElementById(`point-${hyphenatedPos}`);
+            if (svgPoint) svgPoint.classList.add("selected");
+
+            updateSheetForPos(pos);
+        });
+    });
+
+    // 抽屜滑動條 - 深度
+    if (sheetDepthRange) {
+        sheetDepthRange.addEventListener("input", (e) => {
+            if (!state.selectedPoint) return;
+            const val = parseInt(e.target.value);
+            state.points[state.selectedPoint].depth = val;
+            if (sheetDepthVal) sheetDepthVal.textContent = DEPTH_DESCS[val - 1];
+            updatePointSVGLabel(state.selectedPoint);
+            updateAllSheetBadges();
+            updateSheetResult(state.selectedPoint);
+            // 同步到桌面面板（如果存在）
+            focusDepthRange.value = val;
+            focusDepthVal.textContent = DEPTH_DESCS[val - 1];
+        });
+    }
+
+    // 抽屜滑動條 - 力量
+    if (sheetForceRange) {
+        sheetForceRange.addEventListener("input", (e) => {
+            if (!state.selectedPoint) return;
+            const val = parseInt(e.target.value);
+            state.points[state.selectedPoint].force = val;
+            if (sheetForceVal) sheetForceVal.textContent = FORCE_DESCS[val - 1];
+            updatePointSVGLabel(state.selectedPoint);
+            updateAllSheetBadges();
+            updateSheetResult(state.selectedPoint);
+            // 同步到桌面面板（如果存在）
+            focusForceRange.value = val;
+            focusForceVal.textContent = FORCE_DESCS[val - 1];
+        });
+    }
+
+    // 抽屜快捷預設按鈕
+    sheetPresetBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            if (!state.selectedPoint) return;
+            const depth = parseInt(btn.getAttribute("data-depth"));
+            const force = parseInt(btn.getAttribute("data-force"));
+
+            state.points[state.selectedPoint].depth = depth;
+            state.points[state.selectedPoint].force = force;
+
+            // 更新滑動條
+            if (sheetDepthRange) sheetDepthRange.value = depth;
+            if (sheetForceRange) sheetForceRange.value = force;
+            if (sheetDepthVal) sheetDepthVal.textContent = DEPTH_DESCS[depth - 1];
+            if (sheetForceVal) sheetForceVal.textContent = FORCE_DESCS[force - 1];
+
+            updatePointSVGLabel(state.selectedPoint);
+            updateAllSheetBadges();
+            updateSheetResult(state.selectedPoint);
+
+            // 同步到桌面面板
+            focusDepthRange.value = depth;
+            focusDepthVal.textContent = DEPTH_DESCS[depth - 1];
+            focusForceRange.value = force;
+            focusForceVal.textContent = FORCE_DESCS[force - 1];
+        });
+    });
+
+    // 關閉按鈕
+    if (sheetCloseBtn) {
+        sheetCloseBtn.addEventListener("click", closeMobileSheet);
+    }
+
+    // 點遮罩關閉
+    if (mobileSheetOverlay) {
+        mobileSheetOverlay.addEventListener("click", closeMobileSheet);
+    }
+
+    // 視窗大小改變時關閉抽屜（切換到桌面版）
+    window.addEventListener("resize", () => {
+        if (!isMobile()) {
+            closeMobileSheet();
+        }
+    });
+
+    // 讓 resetAllInputs 也重設抽屜徽章
+    const _originalResetAllInputs = resetAllInputs;
+    // 在 init 後補丁，每次 reset 後更新抽屜徽章
+    const resetInputsBtnEl = document.getElementById("reset-inputs-btn");
+    if (resetInputsBtnEl) {
+        resetInputsBtnEl.addEventListener("click", () => {
+            updateAllSheetBadges();
+            closeMobileSheet();
+        });
+    }
+
     init();
+    // 初始化完成後，同步徽章
+    updateAllSheetBadges();
+
+    // 顯示手機版操作提示
+    const mobileWristHint = document.getElementById("mobile-wrist-hint");
+    function syncMobileHintVisibility() {
+        if (mobileWristHint) {
+            mobileWristHint.style.display = window.innerWidth <= 768 ? "block" : "none";
+        }
+    }
+    syncMobileHintVisibility();
+    window.addEventListener("resize", syncMobileHintVisibility);
+
+    // 讓總脈滑動條改動後也更新底部抽屜徽章
+    [leftDepthRange, leftForceRange, rightDepthRange, rightForceRange].forEach(el => {
+        if (el) {
+            el.addEventListener("input", () => {
+                updateAllSheetBadges();
+                // 如果抽屜已開，也同步更新抽屜結果
+                if (state.selectedPoint && mobileBottomSheet && mobileBottomSheet.classList.contains("active")) {
+                    updateSheetForPos(state.selectedPoint);
+                }
+            });
+        }
+    });
 });

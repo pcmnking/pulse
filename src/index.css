@@ -1126,6 +1126,390 @@ main {
     to { opacity: 1; transform: scale(1); }
 }
 
+@keyframes slideUpSheet {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* ==========================================================================
+   📱 手機版底部抽屜 (Mobile Bottom Sheet for 部位設定)
+   ========================================================================== */
+
+/* 底部抽屜遮罩 */
+.mobile-sheet-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 500;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-sheet-overlay.active {
+    opacity: 1;
+}
+
+/* 底部抽屜容器 */
+.mobile-bottom-sheet {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 501;
+    background: var(--bg-card);
+    border-radius: 20px 20px 0 0;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+    max-height: 88vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    padding: 0 1.25rem 1.5rem;
+    /* 安全區域適配 iPhone */
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+
+.mobile-bottom-sheet.active {
+    transform: translateY(0);
+}
+
+/* 抽屜頂部拉柄 */
+.sheet-handle {
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem 0 0.5rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    z-index: 1;
+    border-radius: 20px 20px 0 0;
+}
+
+.sheet-handle-bar {
+    width: 40px;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+/* 抽屜標題列 */
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+    position: sticky;
+    top: 44px;
+    background: var(--bg-card);
+    z-index: 1;
+}
+
+.sheet-header-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.sheet-close-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+}
+
+.sheet-close-btn:hover, .sheet-close-btn:active {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+/* 抽屜內的快速部位選擇器 */
+.sheet-part-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.sheet-part-btn {
+    background: var(--bg-primary);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.6rem 0.4rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+    transition: var(--transition-smooth);
+    line-height: 1.3;
+}
+
+.sheet-part-btn .part-icon {
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.sheet-part-btn.active {
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.sheet-part-btn.abnormal {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: rgba(var(--color-accent-rgb), 0.06);
+}
+
+.sheet-part-btn.active.abnormal {
+    background: rgba(var(--color-accent-rgb), 0.12);
+}
+
+/* 抽屜內的滑動條區域 - 更大，方便手指操作 */
+.sheet-sliders {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.sheet-slider-row {
+    margin-bottom: 1rem;
+}
+
+.sheet-slider-row:last-child {
+    margin-bottom: 0;
+}
+
+.sheet-slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.sheet-slider-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.sheet-slider-val {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--bg-card);
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* 手機版更大的滑動條 */
+.sheet-range {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border-color);
+    outline: none;
+    margin: 6px 0;
+}
+
+.sheet-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.1s ease;
+}
+
+.sheet-range::-webkit-slider-thumb:active {
+    transform: scale(1.15);
+}
+
+.sheet-range-ticks {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 4px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* 抽屜內的快捷預設按鈕 */
+.sheet-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.sheet-preset-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 0.4rem;
+    font-size: 0.78rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text-secondary);
+    transition: var(--transition-smooth);
+    text-align: center;
+    font-weight: 500;
+}
+
+.sheet-preset-btn:active {
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: scale(0.97);
+}
+
+/* 抽屜內的結果區 */
+.sheet-result-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sheet-result-code {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    font-family: monospace;
+    min-width: 44px;
+    text-align: center;
+}
+
+.sheet-result-info {
+    flex: 1;
+}
+
+.sheet-result-info .state-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.2rem;
+}
+
+.sheet-result-info .desc-text {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* 抽屜提示：點擊手腕圖 */
+.sheet-tap-hint {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.sheet-tap-hint i {
+    font-size: 2rem;
+    color: var(--color-primary);
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* ============================================================
+   手機版手腕圖容器 - 橫向並排更緊湊
+   ============================================================ */
+@media (max-width: 768px) {
+    /* 手腕圖橫向並排，壓縮高度 */
+    .wrist-visualizer-container {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
+        align-items: stretch !important;
+    }
+
+    /* 隱藏摘要看板（手機不顯示，空間不夠）*/
+    #card-summary-board {
+        display: none !important;
+    }
+
+    /* 手腕卡片縮小 */
+    .wrist-card {
+        max-width: none !important;
+        padding: 0.5rem !important;
+        flex: 1 !important;
+    }
+
+    .wrist-card h4 {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.25rem !important;
+        text-align: center;
+    }
+
+    /* SVG 手腕圖縮小，方便雙手並排 */
+    .wrist-svg {
+        max-height: 160px !important;
+    }
+
+    /* 提示文字縮小 */
+    #diagnoser .glass-card:nth-child(2) > p {
+        font-size: 0.8rem;
+    }
+
+    /* 桌面版 focus-config-panel 在手機上隱藏 */
+    #focus-config-panel {
+        display: none !important;
+    }
+
+    /* 顯示底部抽屜相關元件 */
+    .mobile-sheet-overlay {
+        display: block;
+    }
+
+    .mobile-bottom-sheet {
+        display: block;
+    }
+
+    /* 加大滑動條 thumb (全局) */
+    .custom-range::-webkit-slider-thumb {
+        width: 24px !important;
+        height: 24px !important;
+    }
+    .custom-range {
+        height: 5px !important;
+    }
+}
+
 /* Footer 說明 */
 footer {
     text-align: center;

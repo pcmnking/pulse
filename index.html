@@ -256,6 +256,11 @@
                             </div>
                         </div>
 
+                        <!-- 📱 手機版：快速開啟提示 -->
+                        <div class="mobile-wrist-hint" id="mobile-wrist-hint" style="display:none; margin-bottom:0.75rem; padding:0.6rem 0.75rem; background: rgba(var(--color-primary-rgb),0.08); border: 1px solid rgba(var(--color-primary-rgb),0.2); border-radius:8px; font-size:0.8rem; color:var(--color-primary); text-align:center;">
+                            <i class="fa-solid fa-hand-pointer"></i> 點擊上方手腕圖部位，即可調整深度與力量
+                        </div>
+
                         <!-- 🎯 部位設定微調面板 (動態浮出) -->
                         <div class="focus-config-box" id="focus-config-panel">
                             <div class="focus-config-title">
@@ -626,6 +631,107 @@
             <button class="ppt-btn" id="ppt-prev-btn"><i class="fa-solid fa-arrow-left"></i></button>
             <span style="font-size: 1.1rem; font-weight: 600;" id="ppt-page-indicator">第 1 / 10 頁</span>
             <button class="ppt-btn" id="ppt-next-btn"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ==================== 📱 手機版底部抽屜 (部位設定) ==================== -->
+    <!-- 遮罩背景 -->
+    <div class="mobile-sheet-overlay" id="mobile-sheet-overlay"></div>
+
+    <!-- 底部抽屜 -->
+    <div class="mobile-bottom-sheet" id="mobile-bottom-sheet">
+        <!-- 拉柄 -->
+        <div class="sheet-handle">
+            <div class="sheet-handle-bar"></div>
+        </div>
+
+        <!-- 標題列 -->
+        <div class="sheet-header">
+            <span class="sheet-header-title">
+                <i class="fa-solid fa-hand-pointer"></i>
+                <span id="sheet-part-name">調整部位設定</span>
+            </span>
+            <button type="button" class="sheet-close-btn" id="sheet-close-btn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- 快速部位選擇器 (6 格) -->
+        <div class="sheet-part-selector" id="sheet-part-selector">
+            <button type="button" class="sheet-part-btn" data-pos="leftCun">
+                <span class="part-icon">🫀</span>
+                左寸<br><small style="font-weight:400;opacity:0.8;">(心)</small>
+                <div style="font-size:0.68rem; font-family:monospace; margin-top:2px; color:var(--color-primary);" id="sheet-badge-leftCun">C3</div>
+            </button>
+            <button type="button" class="sheet-part-btn" data-pos="leftGuan">
+                <span class="part-icon">🌿</span>
+                左關<br><small style="font-weight:400;opacity:0.8;">(肝膽)</small>
+                <div style="font-size:0.68rem; font-family:monospace; margin-top:2px; color:var(--color-primary);" id="sheet-badge-leftGuan">C3</div>
+            </button>
+            <button type="button" class="sheet-part-btn" data-pos="leftChi">
+                <span class="part-icon">💧</span>
+                左尺<br><small style="font-weight:400;opacity:0.8;">(腎陰)</small>
+                <div style="font-size:0.68rem; font-family:monospace; margin-top:2px; color:var(--color-primary);" id="sheet-badge-leftChi">C3</div>
+            </button>
+            <button type="button" class="sheet-part-btn" data-pos="rightCun">
+                <span class="part-icon">🫁</span>
+                右寸<br><small style="font-weight:400;opacity:0.8;">(肺)</small>
+                <div style="font-size:0.68rem; font-family:monospace; margin-top:2px; color:var(--color-primary);" id="sheet-badge-rightCun">C3</div>
+            </button>
+            <button type="button" class="sheet-part-btn" data-pos="rightGuan">
+                <span class="part-icon">🌾</span>
+                右關<br><small style="font-weight:400;opacity:0.8;">(脾胃)</small>
+                <div style="font-size:0.68rem; font-family:monospace; margin-top:2px; color:var(--color-primary);" id="sheet-badge-rightGuan">C3</div>
+            </button>
+            <button type="button" class="sheet-part-btn" data-pos="rightChi">
+                <span class="part-icon">🔥</span>
+                右尺<br><small style="font-weight:400;opacity:0.8;">(腎陽)</small>
+                <div style="font-size:0.68rem; font-family:monospace; margin-top:2px; color:var(--color-primary);" id="sheet-badge-rightChi">C3</div>
+            </button>
+        </div>
+
+        <!-- 滑動條設定區 -->
+        <div class="sheet-sliders">
+            <div class="sheet-slider-row">
+                <div class="sheet-slider-header">
+                    <span class="sheet-slider-label"><i class="fa-solid fa-arrows-up-down" style="color:var(--color-primary);"></i> 脈層深度</span>
+                    <span class="sheet-slider-val" id="sheet-depth-val">C層 (中)</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" class="sheet-range" id="sheet-depth-range">
+                <div class="sheet-range-ticks">
+                    <span>A(淺)</span><span>B</span><span>C(中)</span><span>D</span><span>E(深)</span>
+                </div>
+            </div>
+            <div class="sheet-slider-row">
+                <div class="sheet-slider-header">
+                    <span class="sheet-slider-label"><i class="fa-solid fa-weight-hanging" style="color:var(--color-primary);"></i> 按壓力量</span>
+                    <span class="sheet-slider-val" id="sheet-force-val">3級 (中)</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" class="sheet-range" id="sheet-force-range">
+                <div class="sheet-range-ticks">
+                    <span>1(弱)</span><span>2</span><span>3(中)</span><span>4</span><span>5(實)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 常用快捷脈象 -->
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.4rem;">⚡ 常用脈象快捷：</div>
+        <div class="sheet-presets">
+            <button type="button" class="sheet-preset-btn" data-depth="3" data-force="3">平脈 C3</button>
+            <button type="button" class="sheet-preset-btn" data-depth="3" data-force="4">弦脈 C4</button>
+            <button type="button" class="sheet-preset-btn" data-depth="4" data-force="2">細脈 D2</button>
+            <button type="button" class="sheet-preset-btn" data-depth="2" data-force="2">弱脈 B2</button>
+            <button type="button" class="sheet-preset-btn" data-depth="2" data-force="4">滑脈 B4</button>
+            <button type="button" class="sheet-preset-btn" data-depth="1" data-force="3">浮脈 A3</button>
+        </div>
+
+        <!-- 診斷結果預覽 -->
+        <div class="sheet-result-box">
+            <div class="sheet-result-code" id="sheet-result-code">C3</div>
+            <div class="sheet-result-info">
+                <span class="state-tag organ-status-tag normal" id="sheet-result-state">正常</span>
+                <div class="desc-text" id="sheet-result-desc">脈象平穩從容。</div>
+            </div>
         </div>
     </div>
 
