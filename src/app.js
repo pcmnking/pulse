@@ -558,13 +558,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!container) return;
 
         const DEPTH_LETTERS = ["A", "B", "C", "D", "E"];
+        // organ = 部位所候臟腑（把脈位置固定對應），zangfuLabel 由脈象動態決定
         const posInfos = [
-            { key: "leftCun",   label: "左寸", organ: "心/腦" },
-            { key: "leftGuan",  label: "左關", organ: "肝膽" },
-            { key: "leftChi",   label: "左尺", organ: "腎陰" },
-            { key: "rightCun",  label: "右寸", organ: "肺" },
-            { key: "rightGuan", label: "右關", organ: "脾胃" },
-            { key: "rightChi",  label: "右尺", organ: "腎陽" }
+            { key: "leftCun",   label: "左寸", organ: "心、腦（神明）" },
+            { key: "leftGuan",  label: "左關", organ: "肝、膽（疏泄）" },
+            { key: "leftChi",   label: "左尺", organ: "腎陰、胞宮（藏精）" },
+            { key: "rightCun",  label: "右寸", organ: "肺、胸中（宣降）" },
+            { key: "rightGuan", label: "右關", organ: "脾、胃（運化）" },
+            { key: "rightChi",  label: "右尺", organ: "腎陽、命門（元陽）" }
         ];
 
         let rows = posInfos.map(info => {
@@ -581,22 +582,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return `
                 <tr>
-                    <td style="white-space:nowrap; font-weight:600; font-size:0.8rem;">${info.label}<br><span style="font-weight:400; font-size:0.72rem; color:var(--text-muted);">(${info.organ})</span></td>
+                    <td style="white-space:nowrap; font-weight:600; font-size:0.8rem;">
+                        ${info.label}
+                        <div style="font-weight:500; font-size:0.7rem; color:var(--color-primary); margin-top:2px;">${info.organ}</div>
+                    </td>
                     <td><span class="${codeClass}">${depthLetter}${f}</span></td>
                     <td><span class="${pulseClass}">${binhuName}</span><br><span style="font-size:0.68rem; color:var(--text-muted);">${binhuDesc.category} · ${binhuDesc.nature}</span></td>
-                    <td style="font-size:0.7rem; color:var(--text-secondary); line-height:1.4;">${binhuDesc.zangfu}</td>
+                    <td style="font-size:0.7rem; line-height:1.5;">
+                        <div style="color:var(--text-secondary);">${binhuDesc.zangfu}</div>
+                    </td>
                 </tr>
             `;
         }).join("");
 
         container.innerHTML = `
+            <div style="margin-bottom:0.6rem; font-size:0.72rem; color:var(--text-muted); line-height:1.6; padding:0.5rem 0.75rem; background:rgba(var(--color-primary-rgb),0.06); border-radius:6px; border-left:3px solid var(--color-primary);">
+                <strong style="color:var(--color-primary)">📖 欄位說明</strong>｜
+                <span style="color:var(--text-primary)">部位所候</span>（藍色）= 此把脈位置固定監測的臟腑；
+                <span style="color:var(--text-primary)">脈象主病</span>（末欄）= 《瀕湖脈學》此脈型所主的病變臟腑。兩者需合併解讀。
+            </div>
             <table class="binhu-table">
                 <thead>
                     <tr>
-                        <th>部位</th>
+                        <th>部位<br><span style="font-weight:400;font-size:0.65rem;color:rgba(255,255,255,0.6);">（所候臟腑）</span></th>
                         <th>編碼</th>
                         <th>《瀕湖脈學》脈象</th>
-                        <th>主臟腑</th>
+                        <th>脈象主病臟腑<br><span style="font-weight:400;font-size:0.65rem;color:rgba(255,255,255,0.6);">（按《瀕湖》脈型）</span></th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>

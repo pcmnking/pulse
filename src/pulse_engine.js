@@ -110,13 +110,14 @@ const PulseEngine = {
         const DEPTH_CN = ["最淺層(表/浮)", "淺層(半表)", "中層(胃氣/平)", "深層(半裡)", "最深層(裡/伏)"];
         const FORCE_CN = ["極無力(極虛)", "無力(偏虛)", "中等力量(平和)", "有力(偏實)", "極有力(極實)"];
 
+        // posOrgan = 部位所候臟腑（固定，由寸關尺位置決定）
         const posInfos = [
-            { key: "leftCun",  label: "左手寸部（心、腦、神明）" },
-            { key: "leftGuan", label: "左手關部（肝、膽、情緒）" },
-            { key: "leftChi",  label: "左手尺部（腎陰、內分泌）" },
-            { key: "rightCun", label: "右手寸部（肺、胸中、衛氣）" },
-            { key: "rightGuan",label: "右手關部（脾、胃、中焦）" },
-            { key: "rightChi", label: "右手尺部（腎陽、命門火）" }
+            { key: "leftCun",   label: "左手寸部", posOrgan: "心、腦（神明）" },
+            { key: "leftGuan",  label: "左手關部", posOrgan: "肝、膽（疏泄）" },
+            { key: "leftChi",   label: "左手尺部", posOrgan: "腎陰、胞宮（藏精）" },
+            { key: "rightCun",  label: "右手寸部", posOrgan: "肺、胸中（宣降）" },
+            { key: "rightGuan", label: "右手關部", posOrgan: "脾、胃（運化）" },
+            { key: "rightChi",  label: "右手尺部", posOrgan: "腎陽、命門（元陽）" }
         ];
 
         const lifestyleMap = {
@@ -138,6 +139,11 @@ const PulseEngine = {
         lines.push("本系統使用台灣中醫師精細把脈方法，將橈動脈分為 A(最淺)～E(最深) 五個層次，");
         lines.push("力道分為 1(最弱)～5(最強) 五個等級，每個部位用「層次+力道」編碼記錄。");
         lines.push("");
+        lines.push("▌重要概念區分：");
+        lines.push("  ①【部位所候臟腑】= 由寸關尺把脈位置固定決定，反映該臟腑的氣血狀態。");
+        lines.push("  ②【脈象主病臟腑】= 由脈型決定，《瀕湖脈學》此脈型最常指向的病變臟腑。");
+        lines.push("  ➜ 解讀方法：以①定位（哪個臟腑有病），以②判性（病的性質與傾向），二者合參。");
+        lines.push("");
 
         posInfos.forEach(info => {
             const p = pointsState[info.key];
@@ -150,11 +156,13 @@ const PulseEngine = {
 
             lines.push(`### ${info.label}`);
             lines.push(`- **系統編碼**：${depthLetter}${f}（深度：${DEPTH_CN[d-1]}，力量：${FORCE_CN[f-1]}）`);
+            lines.push(`- **①【部位所候臟腑】**：${info.posOrgan}　（此把脈位置固定監測的臟腑）`);
             lines.push(`- **對應《瀕湖脈學》脈象**：**${binhuName}**（${binhuDesc.category}｜性質：${binhuDesc.nature}）`);
-            lines.push(`- **所屬臟腑**：${binhuDesc.zangfu}`);
+            lines.push(`- **②【脈象主病臟腑】**：${binhuDesc.zangfu}　（此脈型按《瀕湖》所主的病臟腑）`);
             if (!isNormal) {
                 lines.push(`- **脈象體狀**（原典）：「${binhuDesc.tizhuang}」`);
                 lines.push(`- **主病**：${binhuDesc.zhibing}`);
+                lines.push(`- **➜ 合參解讀**：「${info.posOrgan}」位出現「${binhuName}」，提示此部位臟腑受到「${binhuDesc.nature}」性質影響，宜結合①②共同分析病機。`);
             } else {
                 lines.push(`- **脈象狀態**：平脈，氣血和調，此部位無明顯異常。`);
             }
